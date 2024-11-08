@@ -3,46 +3,22 @@ const inputNumber = document.getElementById('number-input')
 const btnAddContact = document.getElementById('btn-create-new-contact')
 const btnDeleteList = document.getElementById('btn-delete-list')
 const errorLog = document.getElementById('error-message-log')
-const contactListDiv = document.getElementById('class-list')
 const listOfContacts = document.getElementById('contacts')
 
 
-const errormessage = document.createElement('p')
-errorLog.appendChild(errormessage)
+const errorMessage = document.createElement('p')
+errorLog.appendChild(errorMessage)
 
-console.log(btnDeleteList)
-btnAddContact.addEventListener("click", addContact)
+btnAddContact.addEventListener('click', addContact)
 btnDeleteList.addEventListener('click', clearContactList)
 
 
 function addContact() {
-    if (isInputEmpty(inputName, inputNumber) && isNumberValid(inputNumber)) {
-        errormessage.textContent = ''
+    if (isInputValid(inputName, inputNumber)) {
+        clearErrorMessage()
 
-        const contactElement = document.createElement('li')
+        const contactElement = createContactElement(inputName.value, inputNumber.value)
         listOfContacts.appendChild(contactElement)
-
-        const nameTextField = document.createElement('input')
-        contactElement.appendChild(nameTextField)
-        nameTextField.value = inputName.value
-        nameTextField.disabled = true
-
-        const numberTextField = document.createElement('input')
-        contactElement.appendChild(numberTextField)
-        numberTextField.value = inputNumber.value
-        numberTextField.disabled = true
-
-        const btnChangeContact = document.createElement('button')
-        contactElement.appendChild(btnChangeContact)
-        btnChangeContact.innerHTML = 'Ändra'
-
-        setupChangeContactBtn(btnChangeContact, nameTextField, numberTextField)
-
-        const btnDeleteContact = document.createElement('button')
-        contactElement.appendChild(btnDeleteContact)
-        btnDeleteContact.innerHTML = 'Radera'
-
-        setupDeleteContactBtn(btnDeleteContact)
 
         inputName.value = ''
         inputNumber.value = ''
@@ -52,27 +28,47 @@ function addContact() {
     }
 }
 
-function setupChangeContactBtn(btn, nameTextField, numberTextField) {
-    btn.addEventListener('click', function handleClick() {
-        if (btn.innerHTML === 'Ändra') {
-            btn.innerHTML = 'Spara'
-            nameTextField.disabled = false
-            numberTextField.disabled = false
-        } else {
-            if (isInputEmpty(nameTextField, numberTextField) && isNumberValid(numberTextField)) {
-                btn.innerHTML = 'Ändra'
-                nameTextField.disabled = true
-                numberTextField.disabled = true
-                errormessage.textContent = ''
-            } else {
-                displayErrorMessage(nameTextField, numberTextField)
-            }
-        }
-    })
+function createContactElement(name, number) {
+    const contactItem = document.createElement('li')
+
+    const nameField = createTextField(name)
+    const numberField = createTextField(number)
+    
+    const editButton = createButton('Ändra', () => editContact(editButton, nameField, numberField))
+    const deleteButton = createButton('Radera', () => contactItem.remove())
+
+    contactItem.append(nameField, numberField, editButton, deleteButton)
+    return contactItem
 }
 
-function setupDeleteContactBtn(btn) {
-    btn.addEventListener('click', () => btn.parentElement.remove())
+function createTextField(value) {
+    const field = document.createElement('input')
+    field.value = value
+    field.disabled = true
+    return field
+}
+
+function createButton(label, onClick) {
+    const button = document.createElement('button')
+    button.textContent = label
+    button.addEventListener('click', onClick)
+    return button
+}
+
+function editContact(btn, nameTextField, numberTextField) {
+    const isEditing = btn.textContent === 'Spara'
+    if (isEditing) {
+        if ((isInputValid(nameTextField, numberTextField))) {
+            btn.innerHTML = 'Ändra'
+            nameTextField.disabled = numberTextField.disabled = true
+            clearErrorMessage()
+        } else {
+            displayErrorMessage(nameTextField, numberTextField)
+        }
+    } else {
+        btn.innerHTML = 'Spara'
+        nameTextField.disabled = numberTextField.disabled = false
+    }
 }
 
 function clearContactList() {
@@ -88,11 +84,19 @@ function isNumberValid(input) {
     return regex.test(input.value)
 }
 
+function isInputValid(nameInput, numberInput) {
+    return !isFieldEmpty(nameInput, numberInput) && isNumberValid(numberInput);
+}
+
 function displayErrorMessage(inputName, inputNumber) {
-    if (isInputEmpty(inputName, inputNumber) === false) {
-        errormessage.textContent = 'Får ej spara kontakt med tomt textfält'
+    if (isFieldEmpty(inputName, inputNumber)) {
+        errorMessage.textContent = 'Får ej spara kontakt med tomt textfält'
     } else {
-        errormessage.textContent = 'Telefonnummer får endast innehålla nummer, mellanslag och bindestreck'
+        errorMessage.textContent = 'Telefonnummer får endast innehålla nummer, mellanslag och bindestreck'
     }
     
+}
+
+function clearErrorMessage() {
+    errorMessage.textContent = ''
 }
