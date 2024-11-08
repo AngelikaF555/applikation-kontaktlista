@@ -1,4 +1,10 @@
 # applikation-kontaktlista
+<h3>Uppgifts beskrivning</h3>
+<p>En kontaktlista där man kan lägga till, ändra och ta bort kontakter.</p>
+
+<h3>Använda språk</h3>
+<p>HTML och JS</p>
+
 <h3>PSUDO-KOD</h3>
 
 <p>Lista med kontakter finns. Dessa kontakter  kan raderas och ändras. Om inte både namn och telefon nummer finns, får användaren ett felmedelande att inte obligatoriska fält är ifyllda.
